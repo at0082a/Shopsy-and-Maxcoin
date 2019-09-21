@@ -5,7 +5,7 @@ const http = require('http');
 const config = require('../config');
 const App = require('../app');
 const mongoose = require('mongoose');
-
+const redis = require('redis');
 const log = config.logger;
 
 /* Logic to start the application */
@@ -17,6 +17,13 @@ mongoose.connect(config.mongodb.dsn)
   .then(() => {
     log.info('Successfully connected to mongoDb');
   });
+
+const redisClient = redis.createClient(config.redis.options);
+redisClient.on('ready', () => {
+  log.info('Successfully connected to Redis');
+});
+
+config.redis.client = redisClient;
 
 function onError(error) {
   if (error.syscall !== 'listen') {
