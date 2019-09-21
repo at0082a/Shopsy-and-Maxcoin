@@ -14,9 +14,9 @@ const port = process.env.PORT || '3000';
 app.set('port', port);
 
 mongoose.connect(config.mongodb.dsn)
-  .then (() => {
-    log.info('Successfully connected to mongoDb')
-});
+  .then(() => {
+    log.info('Successfully connected to mongoDb');
+  });
 
 function onError(error) {
   if (error.syscall !== 'listen') {

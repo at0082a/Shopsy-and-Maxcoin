@@ -2,6 +2,7 @@
 const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
 const dsn = 'mongodb://localhost:37017/maxcoin'
+const redis = require('redis');
 
 
 function insertMongodb(collection, data) {
@@ -45,4 +46,20 @@ MongoClient.connect(dsn, (err, db) => {
             process.exit();
         });
     });
+});
+
+function insertRedis (client, data, callback) {
+    const values = ['values']
+
+    Object.keys(data).forEach ((key) => {
+        values.push(data[key]);
+        values.push(key);
+    });
+
+    client.zadd(values, callback);
+}
+
+const redisclient = redis.createClient(7379);
+redisclient.on('connect', () {
+
 });
