@@ -3,7 +3,7 @@ const request = require('request');
 const MongoClient = require('mongodb').MongoClient;
 const dsn = 'mongodb://localhost:37017/maxcoin'
 const redis = require('redis');
-
+const mysql = require('mysql');
 
 function insertMongodb(collection, data) {
     const promisedInserts = [];
@@ -78,3 +78,36 @@ redisClient.on('connect', () => {
         });
     });
 });
+
+function insertMySql (connection, data, callback) {
+    const values = [];
+    const sql = 'INSERT INTO coinvalues (valuedate, coinvalue) VALUES ? ';
+    
+    Object.keys(data).forEach ((key) => {
+        values.push([key, data[key]]);
+    });
+
+    connection.query(sql, [values], callback)
+}
+
+const connection = mySql.createConnection({
+    host: 'localhost',
+    port: 3406,
+    user: 'root',
+    password: 'password',
+    database: 'maxcoin'
+});
+
+connection.connect((err) => {
+    if (err) throw err;
+    console.log('Successfully connected to mysql');
+    fetchFromAPI((err, data) => {
+        if (err) throw err
+
+        insertMySql((connection, data.bpi, (err, results, fields)) => {
+            if (err) throw err;
+            console.log(`Successfully inserted ${results.affectedRows} into database`);
+        });
+    });
+    connection.end();
+})

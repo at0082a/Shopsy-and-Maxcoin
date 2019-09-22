@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const routeHandler = require('./routes');
 const RedisStore = require('connect-redis')(session);
+const basketService = require('./services/basketService');
+const userService = require('./services/userService');  
 
 module.exports = (config) => {
   const app = express();
@@ -14,6 +16,8 @@ module.exports = (config) => {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
+
+  const basket = basketService(config.redis.client);
 
   app.set('trust proxy', 1); // trust first proxy
   app.use(session({
@@ -43,7 +47,21 @@ module.exports = (config) => {
       req.session.messages = [];
     }
     res.locals.messages = req.session.messages;
-    return next();
+    try {
+      if (res.session.userId) {
+        res.locals.currentUser = await userService.getOne(req.session.userId);
+        const basketContents = await basket.getAll(req.session.userId);
+        let count = 0;
+        if (basketContents) {
+          Object.keys(basketContents).forEach((key) => {
+            count += parseInt(basketContents[key], 10);
+          });
+        }
+        res.locals.basketCount = count;
+      }
+    } catch (error) {
+      return next(error);
+    }
   });
 
   app.use('/', routeHandler(config));
