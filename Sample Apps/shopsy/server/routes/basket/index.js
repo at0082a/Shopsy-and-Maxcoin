@@ -1,13 +1,17 @@
 const express = require('express');
 
+const basketService = require('../../services/basketService');
+const orderService = require('../../services/orderService');
+const itemService = require('../../services/itemService');
+const userService = require('../../services/userService');
+
 module.exports = (config) => {
   const router = express.Router();
   const log = config.logger;
+  const basket = basketService(config.redis.client);
+  const order = orderService(config.mysql.client);
 
-  router.get('/', async (req, res) => {
-    return res.render('basket', {});
-
-    /*
+  router.get('/', async (req, res) => {s
     const basketItems = await basket.getAll(res.locals.currentUser.id);
     let items = [];
     if (basketItems) {
@@ -18,13 +22,10 @@ module.exports = (config) => {
       }));
     }
     return res.render('basket', { items });
-    */
   });
 
   router.get('/remove/:itemId', async (req, res, next) => {
-    return next('Not implemented');
 
-    /*
     if (!res.locals.currentUser) {
       req.session.messages.push({
         type: 'warning',
@@ -47,15 +48,11 @@ module.exports = (config) => {
       log.fatal(err);
       return res.redirect('/basket');
     }
-
-    return res.redirect('/basket');
-    */
+    return res.redirect('/basket');       
   });
 
   router.get('/buy', async (req, res, next) => {
-    return next('Not implemented');
 
-    /*
     try {
       const userId = res.locals.currentUser.id;
       const user = res.locals.currentUser;
@@ -100,7 +97,6 @@ module.exports = (config) => {
       log.fatal(err);
       return res.redirect('/basket');
     }
-    */
   });
 
   return router;

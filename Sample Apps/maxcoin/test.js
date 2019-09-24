@@ -107,7 +107,11 @@ connection.connect((err) => {
         insertMySql((connection, data.bpi, (err, results, fields)) => {
             if (err) throw err;
             console.log(`Successfully inserted ${results.affectedRows} into database`);
+            connection.query('SELECT * FROM coinvalues ORDER By coinvalue DESC LIMIT 0, 1', (err, results) => {
+                if (err) throw err;
+                console.log(`MySQL: the max one month value is ${results[0].coinvalue} and was reached on ${results[0].valuedate}`);
+                connection.end();
+            });
         });
     });
-    connection.end();
-})
+});

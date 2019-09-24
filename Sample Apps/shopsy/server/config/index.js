@@ -11,4 +11,14 @@ module.exports = {
   redis: {
     options: { port: 7379 },
   },
+  mysql: {
+    options: {
+      host: 'localhost',
+      password: 'password',
+      database: 'shopsy',
+      port: 3406,
+      username: 'root',
+      dialect: 'mysql',
+    },
+  },
 };

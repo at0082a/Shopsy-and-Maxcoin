@@ -7,11 +7,13 @@ const App = require('../app');
 const mongoose = require('mongoose');
 const redis = require('redis');
 const log = config.logger;
+const Sequelize = require('sequelize');
 
 /* Logic to start the application */
 const app = App(config);
 const port = process.env.PORT || '3000';
 app.set('port', port);
+
 
 mongoose.connect(config.mongodb.dsn)
   .then(() => {
@@ -23,6 +25,14 @@ redisClient.on('ready', () => {
   log.info('Successfully connected to Redis');
 });
 
+const sequelize = new Sequelize(config.mysql.options);
+sequelize
+  .authenticate()
+  .then(() => {
+    log.info('successfully connected to mysql');
+  });
+
+config.mysql.client = sequelize;
 config.redis.client = redisClient;
 
 function onError(error) {
